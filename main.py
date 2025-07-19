@@ -14,6 +14,29 @@ symbol_count = {
     "D": 8
 }
 
+symbol_values = {
+    "A": 5,
+    "B": 4,
+    "C": 3,
+    "D": 2
+}
+
+def check_winnings(columns, lines, bet, values):
+    winnings = 0
+    winning_lines = []
+    # Just need to look at the rows
+    for line in range(lines):
+        #Check every symbol is the same
+        symbol = columns[0][line]
+        for column in columns:
+            symbol_to_check = column[line]
+            if symbol != symbol_to_check:
+                break # Break out, check the next line because they did not win
+        else:
+            winnings += values[symbol] * bet
+    return winnings, winning_lines
+
+
 def get_slot_machine_spin(rows, cols, symbols):
     all_symbol = []
     for symbol, symbol_count in symbols.items():
@@ -39,7 +62,7 @@ def print_slot_machine(columns):
                 print(column[row], end=" | ")
             else:
                 print(column[row], end="")
-                
+
         print()
 
 
@@ -87,8 +110,8 @@ def get_bet():
             print("Please enter a number")
     return amount
 
-def main():
-    balance = deposit()
+
+def spin(balance):
     lines = getNumberOfLines()
     while True:
 
@@ -103,6 +126,22 @@ def main():
     print(f"You are betting {bet} on {lines} lines. Total bet is equal to ${total_bet}")
     slots = get_slot_machine_spin(ROWS, COLS, symbol_count)
     print_slot_machine(slots)
+    winning, winning_lines = check_winnings(slots, lines, bet, symbol_values)
+    print(f"You won {winning}. ")
+    print(f"You won on lines: ", *winning_lines)
+    return winning - total_bet #Tell how much the client wins or loss
+
+
+def main():
+    balance = deposit()
+    while True: 
+        print(f"Current balance is: ${balance}")
+        answer = input("Press enter to play (q to quit)")
+        if answer == "q":
+            break
+        balance += spin(balance)
+
+    print(f"You left with ${balance}")
 
 if __name__ == "__main__":
     main()
